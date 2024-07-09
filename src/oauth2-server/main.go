@@ -1,19 +1,18 @@
 package main
 
 import (
-    "fmt"
-    "os"
-    "net/http"
-    "sync"
-    "github.com/gin-gonic/gin"
-    "github.com/joho/godotenv"
+	"fmt"
+	"os"
+	"sync"
+	"github.com/joho/godotenv"
+	"github.com/scfoxcode/oauth2/src/oauth2-server/routes"
 )
 
 func loadConfig() error {
     deployType := os.Getenv("DEPLOY_TYPE")
     isProduction := deployType == "production"
 
-    var envPath string;
+    var envPath string
 
     if isProduction {
         envPath = "config/.live.env"
@@ -32,9 +31,17 @@ func loadConfig() error {
 }
 
 func apiServer() {
-    // Setup router here
+    router := routes.SetupRoutes()
+
     port := os.Getenv("SERVER_PORT")
-    // router.Run(":" + port)
+    err := router.Run(":" + port)
+
+    if err != nil {
+        fmt.Printf("FATAL: Failed to initialise router on port %s\n", port)
+        panic(err)
+    }
+
+    fmt.Printf("Server running on port %s\n", port)
 }
 
 func main() {
@@ -50,11 +57,11 @@ func main() {
     var wg sync.WaitGroup
 
     wg.Add(1)
-    go fun() {
+    go func() {
         defer wg.Done()
         apiServer()
-    }
+    }()
 
     wg.Wait()
-    select {}
+    // select {}
 }
