@@ -9,6 +9,6 @@ func health(ctx *gin.Context) {
     ctx.String(http.StatusOK, "Server Online")
 } 
 
-func Health(routes *gin.RouterGroup) {
+func HealthRoutes(routes *gin.RouterGroup) {
     routes.GET("/", health)
 }
